@@ -3,38 +3,39 @@ pipeline {
 
     stages {
         stage('build') {
-            agent{
+            agent {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
             steps {
-               sh '''
-                    echo "listing files in directory"
-                    ls -la
-                    echo "node version: "
-                    node --version
-                    echo "npm version: "
-                    npm --version
+                sh '''
+                    echo "📦 Installing dependencies..."
                     npm ci
+
+                    echo "🏗️  Building project..."
                     npm run build
-                    echo "what we have after build: "
+
+                    echo "📁 Contents after build:"
                     ls -la
-               '''
+                '''
             }
         }
-        stage('Test'){
 
-            steps{
+        stage('test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
                 sh '''
-                    test -f build/index.html
+                    echo "✅ Running tests..."
                     npm test
                 '''
             }
-        
         }
     }
-
-
 }
